@@ -1,0 +1,26 @@
+{
+  "name": "teamflow-backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21",
+    "cors": "^2.8",
+    "pg": "^8.12",
+    "bcryptjs": "^2.4",
+    "jsonwebtoken": "^9.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5",
+    "@types/express": "^4.17",
+    "@types/cors": "^2.8",
+    "@types/pg": "^8.11",
+    "@types/bcryptjs": "^2.4",
+    "@types/jsonwebtoken": "^9.0",
+    "@types/node": "^20"
+  }
+}
