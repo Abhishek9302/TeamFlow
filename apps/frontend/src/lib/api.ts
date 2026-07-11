@@ -15,7 +15,10 @@ export async function apiFetch(path: string, opts: RequestInit = {}) {
   if (res.status === 401) {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      const path = window.location.pathname;
+      if (path !== "/login" && path !== "/register") {
+        window.location.href = "/login";
+      }
     }
   }
   return res;
