@@ -8,15 +8,16 @@ type User = { id: number; email: string; name: string | null };
 const AuthContext = createContext<{
   user: User | null;
   loading: boolean;
-  refresh: () => void;
+  refresh: () => Promise<void>;
   logout: () => void;
-}>({ user: null, loading: true, refresh: () => {}, logout: () => {} });
+}>({ user: null, loading: true, refresh: async () => {}, logout: () => {} });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refresh = async () => {
+    setLoading(true);
     try {
       const me = await apiJSON("/api/auth/me");
       setUser(me);

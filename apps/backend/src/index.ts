@@ -9,6 +9,7 @@ import projectsRouter from "./routes/projects";
 import sectionsRouter from "./routes/sections";
 import tasksRouter from "./routes/tasks";
 import meRouter from "./routes/me";
+import usersRouter from "./routes/users";
 
 const app = express();
 const PORT = Number(process.env.PORT || "8080");
@@ -25,6 +26,7 @@ app.use(express.json());
 
 app.use("/health", healthRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/projects/:id/sections", sectionsRouter);
 app.use("/api/sections", sectionsRouter);

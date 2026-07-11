@@ -33,3 +33,15 @@ CREATE TABLE IF NOT EXISTS tasks (
   owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS project_members (
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (project_id, user_id)
+);
+
+INSERT INTO project_members (project_id, user_id, role)
+SELECT id, owner_id, 'owner' FROM projects WHERE owner_id IS NOT NULL
+ON CONFLICT DO NOTHING;

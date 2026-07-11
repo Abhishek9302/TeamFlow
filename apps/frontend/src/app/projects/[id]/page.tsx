@@ -7,6 +7,14 @@ import { TaskList } from "@/components/TaskList";
 import { TaskBoard } from "@/components/TaskBoard";
 import { TaskDetailPanel } from "@/components/TaskDetailPanel";
 import { TaskForm } from "@/components/TaskForm";
+import { ProjectMembersPanel } from "@/components/ProjectMembersPanel";
+
+type Member = {
+  id: number;
+  name: string | null;
+  email: string;
+  role: string;
+};
 
 export default function ProjectPage() {
   const { id } = useParams() as { id: string };
@@ -24,10 +32,19 @@ export default function ProjectPage() {
       assignee_user_id?: number | null;
     }[]
   >([]);
-  const [users, setUsers] = useState<{ id: number; name: string | null; email: string }[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [view, setView] = useState<"list" | "board">("list");
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+
+  const fetchMembers = async () => {
+    try {
+      const data = await apiJSON(`/api/projects/${id}/members`);
+      setMembers(data.members || []);
+    } catch {
+      setMembers([]);
+    }
+  };
 
   const fetchAll = async () => {
     try {
@@ -46,10 +63,10 @@ export default function ProjectPage() {
 
   useEffect(() => {
     fetchAll();
-    apiJSON("/api/auth/me")
-      .then((me) => setUsers([me]))
-      .catch(() => setUsers([]));
+    fetchMembers();
   }, [id]);
+
+  const assigneeUsers = members.map((m) => ({ id: m.id, name: m.name, email: m.email }));
 
   const toggleTask = async (taskId: number) => {
     const task = tasks.find((t) => t.id === taskId);
@@ -131,6 +148,8 @@ export default function ProjectPage() {
         </div>
       </div>
 
+      <ProjectMembersPanel projectId={id} members={members} onChange={fetchMembers} />
+
       {view === "list" ? (
         <TaskList tasks={tasks} onTaskClick={setSelectedTaskId} onToggle={toggleTask} />
       ) : (
@@ -146,7 +165,7 @@ export default function ProjectPage() {
                 Close
               </button>
             </div>
-            <TaskForm sections={sections} users={users} onSubmit={createTask} onCancel={() => setShowCreate(false)} />
+            <TaskForm sections={sections} users={assigneeUsers} onSubmit={createTask} onCancel={() => setShowCreate(false)} />
           </div>
         </div>
       ) : null}
@@ -155,7 +174,7 @@ export default function ProjectPage() {
         <TaskDetailPanel
           task={selectedTask}
           sections={sections}
-          users={users}
+          users={assigneeUsers}
           onUpdate={updateTask}
           onDelete={deleteTask}
           onClose={() => setSelectedTaskId(null)}

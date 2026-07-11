@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiJSON } from "@/lib/api";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { refresh } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -20,6 +22,7 @@ export default function RegisterPage() {
         body: JSON.stringify({ email, password, name }),
       });
       localStorage.setItem("token", data.token);
+      await refresh();
       router.replace("/projects");
     } catch (err: any) {
       setError(err.message || "Registration failed");
