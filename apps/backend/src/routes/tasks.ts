@@ -7,14 +7,20 @@ const router = Router();
 router.use(authMiddleware);
 
 router.get("/", async (req: AuthRequest, res) => {
-  const result = await pool.query(
-    `SELECT t.*, u.name as assignee_name
-     FROM tasks t
-     LEFT JOIN users u ON t.assignee_user_id = u.id
-     WHERE t.owner_id = $1
-     ORDER BY t.created_at DESC`,
-    [req.userId]
-  );
+  const projectId = req.query.project_id;
+  const sql = projectId
+    ? `SELECT t.*, u.name as assignee_name
+       FROM tasks t
+       LEFT JOIN users u ON t.assignee_user_id = u.id
+       WHERE t.owner_id = $1 AND t.project_id = $2
+       ORDER BY t.created_at DESC`
+    : `SELECT t.*, u.name as assignee_name
+       FROM tasks t
+       LEFT JOIN users u ON t.assignee_user_id = u.id
+       WHERE t.owner_id = $1
+       ORDER BY t.created_at DESC`;
+  const params = projectId ? [req.userId, projectId] : [req.userId];
+  const result = await pool.query(sql, params);
   res.json({ tasks: result.rows });
 });
 
