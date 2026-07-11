@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  name TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS sections (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  sort_order INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+  section_id INTEGER REFERENCES sections(id) ON DELETE SET NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  due_date DATE,
+  completed BOOLEAN DEFAULT false,
+  assignee_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
